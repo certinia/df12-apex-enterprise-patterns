@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Opportunities</members>
+        <members>OpportunitiesSelector</members>
+        <members>OpportunitiesService</members>
+        <members>OpportunityApplyDiscountController</members>
+        <members>OpportunityCreateInvoiceController</members>
+        <members>OpportunityLineItems</members>
+        <members>OpportunityLineItemsSelector</members>
+        <members>PricebookEntriesSelector</members>
+        <members>PricebooksSelector</members>
+        <members>ProductsSelector</members>
+        <members>QuickOpportunityWizardController</members>
+        <members>SObjectDomain</members>
+        <members>SObjectSelector</members>
+        <members>SObjectUnitOfWork</members>
+        <members>StringBuilder</members>
+        <members>Util</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>opportunityapplydiscount</members>
+        <members>opportunitycreateinvoice</members>
+        <members>quickopportunitywizard</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>OpportunitiesTrigger</members>
+        <members>OpportunityLineItemsTrigger</members>
+        <name>ApexTrigger</name>
+    </types>
+    <version>24.0</version>
+</Package>
