@@ -63,6 +63,10 @@ public virtual with sharing class SObjectDomain
 		SObjectDomain construct(List<SObject> sObjectList);
 	}
 	
+	/**
+	 * Method constructs the given Domain class with the current Trigger context 
+	 * before calling the applicable override methods such as beforeInsert, beforeUpdate etc.
+	 **/
 	public static void triggerHandler(Type domainClass)
 	{
 		String domainClassName = domainClass.getName();
