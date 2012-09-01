@@ -74,9 +74,5 @@ public abstract with sharing class SObjectSelector
 
 	public void assertIsAccessible()
 	{
-		/*
-		if(!getSObjectType().getDescribe().isAccessible())
-			throw new AppException(Messages.getSObjectSelectorObjectTypeNotAccessible(getSObjectType()));
-		*/		
 	}
 }

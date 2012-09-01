@@ -67,7 +67,7 @@ public virtual with sharing class SObjectDomain
 	{
 		String domainClassName = domainClass.getName();
 		Type constructableClass = Type.forName(domainClassName+'.Constructor');
-		IConstructable constructor = (IConstructable) constructableClass.newInstance(); // TODO: Consider caching this?
+		IConstructable constructor = (IConstructable) constructableClass.newInstance();
 		if(Trigger.isBefore)
 	    {
 	        if(Trigger.isInsert) constructor.construct(Trigger.new).beforeInsert();

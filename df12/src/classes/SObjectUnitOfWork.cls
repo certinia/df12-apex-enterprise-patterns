@@ -103,10 +103,10 @@ public class SObjectUnitOfWork
 	public void registerNew(SObject record, Schema.sObjectField relatedToParentField, SObject relatedToParentRecord)
 	{
 		if(record.Id != null)
-			throw new UnitOfWorkException((String)null /* TODO: Label.UnitOfWorkOnlyNewRecsMayRegisterNew */);
+			throw new UnitOfWorkException('Only new records can be registered as new');
 		String sObjectType = record.getSObjectType().getDescribe().getName();			
 		if(!m_newListByType.containsKey(sObjectType))
-			throw new UnitOfWorkException((String) null /* TODO: Messages.getUnitOfWorkSObjectNotSupported(sObjectType) */);
+			throw new UnitOfWorkException(String.format('SObject type {0} is not supported by this unit of work', new String[] { sObjectType }));
 		m_newListByType.get(sObjectType).add(record);				
 		if(relatedToParentRecord!=null && relatedToParentField!=null)
 			registerRelationship(record, relatedToParentField, relatedToParentRecord);
@@ -124,7 +124,7 @@ public class SObjectUnitOfWork
 	{
 		String sObjectType = record.getSObjectType().getDescribe().getName();		
 		if(!m_newListByType.containsKey(sObjectType))
-			throw new UnitOfWorkException((String) null /* Messages.getUnitOfWorkSObjectNotSupported(sObjectType) */);
+			throw new UnitOfWorkException(String.format('SObject type {0} is not supported by this unit of work', new String[] { sObjectType }));
 		m_relationships.get(sObjectType).add(record, relatedToField, relatedTo);
 	}
 	
@@ -136,10 +136,10 @@ public class SObjectUnitOfWork
 	public void registerDirty(SObject record)
 	{
 		if(record.Id == null)
-			throw new UnitOfWorkException((String) null /* Label.UnitOfWorkNewRecsMayNotRegisterDirty */);
+			throw new UnitOfWorkException('New records cannot be registered as dirty');
 		String sObjectType = record.getSObjectType().getDescribe().getName();			
 		if(!m_dirtyListByType.containsKey(sObjectType))
-			throw new UnitOfWorkException((String) null /* Messages.getUnitOfWorkSObjectNotSupported(sObjectType) */);
+			throw new UnitOfWorkException(String.format('SObject type {0} is not supported by this unit of work', new String[] { sObjectType }));
 		m_dirtyListByType.get(sObjectType).add(record);		
 	}
 	
@@ -151,10 +151,10 @@ public class SObjectUnitOfWork
 	public void registerDeleted(SObject record)
 	{
 		if(record.Id == null)
-			throw new UnitOfWorkException((String) null /* Label.UnitOfWorkNewRecsMayNotRegisterDeleted */);
+			throw new UnitOfWorkException('New records cannot be registered for deletion');
 		String sObjectType = record.getSObjectType().getDescribe().getName();			
 		if(!m_deletedListByType.containsKey(sObjectType))
-			throw new UnitOfWorkException((String) null /* Messages.getUnitOfWorkSObjectNotSupported(sObjectType) */);
+			throw new UnitOfWorkException(String.format('SObject type {0} is not supported by this unit of work', new String[] { sObjectType }));
 		m_deletedListByType.get(sObjectType).add(record);							
 	}
 	

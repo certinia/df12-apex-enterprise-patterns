@@ -59,14 +59,10 @@ public with sharing class OpportunityLineItemsSelector extends SObjectSelector
 	public List<OpportunityLineItem> selectRecentlyUsed(ID accountId, Integer recordLimit)
 	{
 		assertIsAccessible();
-		//pricebookEntrySelector.assertIsAccessible();
-		//pricebookSelector.assertIsAccessible();
 		String query = String.format('select {0},{2},{3} FROM {1} WHERE Opportunity.Account.id = :accountId order by SystemModstamp DESC LIMIT :recordLimit', 
 			new List<String>{
 				getFieldListString(),
-				getSObjectName()/*,
-				pricebookEntrySelector.getRelatedFieldListString('PricebookEntry'),
-				pricebookSelector.getRelatedFieldListString('PricebookEntry.Pricebook2')*/
+				getSObjectName()
 			});
 		return (List<OpportunityLineItem>) Database.query(query);
 	}
