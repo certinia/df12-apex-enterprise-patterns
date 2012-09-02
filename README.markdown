@@ -69,4 +69,4 @@ _"Maintains a list of objects affected by a business transaction and coordinates
 * Honours dependency rules between records and updates dependent relationships automatically during the commit cycle
 * Implements CRUD security
 
-**See** [SObjectUnitOfWork.cls](http://martinfowler.com/eaaCatalog/unitOfWork.html)
+**See** [SObjectUnitOfWork.cls](https://github.com/financialforcedev/df12-apex-enterprise-patterns/blob/master/df12/src/classes/SObjectUnitOfWork.clsl)
