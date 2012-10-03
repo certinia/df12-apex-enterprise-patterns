@@ -36,6 +36,7 @@
         <name>CustomField</name>
     </types>
     <types>
+        <members>Invoice__c</members>
         <members>OpportunitySettings__c</members>
         <name>CustomObject</name>
     </types>
