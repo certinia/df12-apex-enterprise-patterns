@@ -39,7 +39,8 @@ public with sharing class OpportunitiesSelector extends SObjectSelector
 			Opportunity.Pricebook2Id,
 			Opportunity.Probability,
 			Opportunity.StageName,
-			Opportunity.Type
+			Opportunity.Type,
+			Opportunity.DiscountType__c
 		};
 	}
 	
@@ -85,7 +86,7 @@ public with sharing class OpportunitiesSelector extends SObjectSelector
 				productSelector.getRelatedFieldListString('PricebookEntry.Product2'),
 				pricebookSelector.getRelatedFieldListString('PricebookEntry.Pricebook2')
 			});
-			
+		
 		return (List<Opportunity>) Database.query(query);
 	}
 }

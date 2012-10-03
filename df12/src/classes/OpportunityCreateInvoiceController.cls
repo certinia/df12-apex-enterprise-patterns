@@ -24,6 +24,10 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
+/**
+ * This controller contains for reference different versions of the controller methods for illustration
+ *   the current controller method used by the page represents the pattern based implementaiton approach
+ **/
 public with sharing class OpportunityCreateInvoiceController 
 {
 	public Decimal DiscountPercentage { get; set; } 
@@ -42,7 +46,7 @@ public with sharing class OpportunityCreateInvoiceController
 			// Create Invoice from line items of the current Opportunity
 			List<ID> invoiceIds = 
 				OpportunitiesService.createInvoices(
-					new List<ID> { standardController.getId() }, DiscountPercentage);
+					new Set<ID> { standardController.getId() }, DiscountPercentage);
 			
 			// Redirect to Invoice 
 			return new PageReference('/'+invoiceIds[0]);									
@@ -51,7 +55,8 @@ public with sharing class OpportunityCreateInvoiceController
 		{
 			ApexPages.addMessages(e);			
 		}	
-		return null;
+				
+		return ApexPages.hasMessages() ? null : standardController.view();
 	}
 	
 	public PageReference createInvoiceV1()
@@ -79,6 +84,6 @@ public with sharing class OpportunityCreateInvoiceController
 			ApexPages.addMessages(e);
 		}
 		
-		return null;		
+		return ApexPages.hasMessages() ? null : standardController.view();
 	}
 }

@@ -24,6 +24,10 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
+/**
+ * This controller contains for reference different versions of the controller methods for illustration
+ *   the current controller method used by the page represents the pattern based implementaiton approach
+ **/
 public with sharing class OpportunityApplyDiscountController 
 {
 	public Decimal DiscountPercentage { get; set; } 
@@ -41,13 +45,14 @@ public with sharing class OpportunityApplyDiscountController
 		{
 			// Apply discount entered to the current Opportunity
 			OpportunitiesService.applyDiscounts(
-				new List<ID> { standardController.getId() }, DiscountPercentage);
+				new Set<ID> { standardController.getId() }, DiscountPercentage);
 		}
 		catch (Exception e)
 		{
 			ApexPages.addMessages(e);
 		}		
-		return null;				
+		
+		return ApexPages.hasMessages() ? null : standardController.view();				
 	}
 	
 	public PageReference applyDiscountV1()
@@ -68,7 +73,7 @@ public with sharing class OpportunityApplyDiscountController
 			ApexPages.addMessages(e);
 		}
 		
-		return null;		
+		return ApexPages.hasMessages() ? null : standardController.view();				
 	}
 	
 	public PageReference applyDiscountV2()
@@ -90,6 +95,6 @@ public with sharing class OpportunityApplyDiscountController
 			ApexPages.addMessages(e);
 		}
 		
-		return null;		
+		return ApexPages.hasMessages() ? null : standardController.view();				
 	}	
 }

@@ -33,7 +33,8 @@ public with sharing class ProductsSelector extends SObjectSelector
 			Product2.Id,
 			Product2.IsActive,
 			Product2.Name,
-			Product2.ProductCode
+			Product2.ProductCode,
+			Product2.DiscountingApproved__c
 		};
 	}
 	

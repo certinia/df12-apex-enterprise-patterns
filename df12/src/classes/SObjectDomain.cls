@@ -28,9 +28,13 @@ public virtual with sharing class SObjectDomain
 {
 	public List<SObject> Records { get; private set;}
 	
+	public Schema.DescribeSObjectResult SObjectDescribe {get; private set;}
+	
 	public SObjectDomain(List<SObject> sObjectList)
 	{
 		Records = sObjectList;
+		
+		SObjectDescribe = Records.getSObjectType().getDescribe();
 	}
 	
 	public virtual void applyDefaults() { }
@@ -48,15 +52,25 @@ public virtual with sharing class SObjectDomain
     
     public virtual void afterInsert()
     {
+    	if(!SObjectDescribe.isCreateable())
+    	   throw new DomainException('Permission to create an ' + SObjectDescribe.getName() + ' dennied.');
+    	   
     	validate(); 
     }
     
     public virtual void afterUpdate(Map<Id,SObject> oldSObjectMap) 
     {
+    	if(!SObjectDescribe.isUpdateable())
+    	   throw new DomainException('Permission to udpate an ' + SObjectDescribe.getName() + ' dennied.');
+    	   
     	validate(); 
     }
     
-    public virtual void afterDelete() { }	
+    public virtual void afterDelete() 
+    {
+    	if(!SObjectDescribe.isDeletable())
+    	   throw new DomainException('Permission to delete an ' + SObjectDescribe.getName() + ' dennied.');
+    }	
 	
 	public interface IConstructable
 	{
@@ -84,5 +98,9 @@ public virtual with sharing class SObjectDomain
 	        else if(Trigger.isUpdate) constructor.construct(Trigger.new).afterUpdate(Trigger.oldMap);
 	        else if(Trigger.isDelete) constructor.construct(Trigger.oldMap.values()).afterDelete();
 	    }		
-	}	
+	}
+	
+	public class DomainException extends Exception
+	{
+	}
 }

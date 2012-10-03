@@ -30,5 +30,20 @@
         <members>OpportunityLineItemsTrigger</members>
         <name>ApexTrigger</name>
     </types>
+    <types>
+        <members>Opportunity.DiscountType__c</members>
+        <members>Product2.DiscountingApproved__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>OpportunitySettings__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Account.QuickOpportunity</members>
+        <members>Opportunity.ApplyDiscount</members>
+        <members>Opportunity.CreateInvoice</members>
+        <name>WebLink</name>
+    </types>
     <version>24.0</version>
 </Package>

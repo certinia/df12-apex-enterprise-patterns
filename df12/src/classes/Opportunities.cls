@@ -62,13 +62,13 @@ public with sharing class Opportunities extends SObjectDomain
 			else
 			{
 				// Collect lines to apply discount to
-				linesToApplyDiscount.add(opportunity.OpportunityLineItems);
+				linesToApplyDiscount.addAll(opportunity.OpportunityLineItems);
 			}
 		}		
 		
 		// Apply discount to lines
 		OpportunityLineItems lineItems = new OpportunityLineItems(linesToApplyDiscount);
-		lineItems.applyDiscount(discountPercentage, uow);
+		lineItems.applyDiscount(this, discountPercentage, uow);
 	}
 	
 	public class Constructor implements SObjectDomain.IConstructable

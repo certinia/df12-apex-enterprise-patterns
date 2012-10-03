@@ -31,8 +31,12 @@ public with sharing class OpportunityLineItems extends SObjectDomain
 		super(sObjectList);
 	}
 	
-	public void applyDiscount(Decimal discountPercentage, SObjectUnitOfWork uow)
+	public void applyDiscount(Opportunities opportunities, Decimal discountPercentage, SObjectUnitOfWork uow)
 	{
+		// Opportunties by Id
+		Map<Id, Opportunity> opportunitiesById = 
+			new Map<Id, Opportunity>((List<Opportunity>) opportunities.Records);
+		
 		// Calculate discount factor
 		Decimal factor = Util.calculateDiscountFactor(discountPercentage);
 		
@@ -40,7 +44,8 @@ public with sharing class OpportunityLineItems extends SObjectDomain
 		for(OpportunityLineItem line : (List<OpportunityLineItem>) Records)
 		{
 			// ENH:1024. Skip products that have not been approved for discounting
-			if(line.Opportunity.DiscountType__c == 'Approved Products')
+			Opportunity opportunity = opportunitiesById.get(line.OpportunityId);
+			if(opportunity.DiscountType__c == 'Approved Products')
 				if(line.PricebookEntry.Product2.DiscountingApproved__c == false)
 					continue;			
 					

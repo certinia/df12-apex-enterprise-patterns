@@ -24,6 +24,10 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
+/**
+ * This controller is not using the pattern approach in this code sample version. See the other two controllers
+ *   in this sample for an illustration of how the patterns are used.
+ **/
 public with sharing class QuickOpportunityWizardController
 {	
 	public ViewState ViewState { get; set; }

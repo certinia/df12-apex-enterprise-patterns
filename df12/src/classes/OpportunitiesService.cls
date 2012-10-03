@@ -33,7 +33,7 @@ global with sharing class OpportunitiesService
 		
 		// Query Opportunities and apply discount
 		Opportunities opportunities = new Opportunities(
-			OpportunitiesSelector.selectByIdWithProducts(opportunityIds));		
+			new OpportunitiesSelector().selectByIdWithProducts(opportunityIds));				
 		opportunities.applyDiscount(discountPercentage, uow);
 		
 		// Commit updates to opportunities		
@@ -47,7 +47,7 @@ global with sharing class OpportunitiesService
 
 		// Query Opportunities
 		Opportunities opportunities = new Opportunities(
-			OpportunitiesSelector.selectByIdWithProducts(opportunityIds));		
+			new OpportunitiesSelector().selectByIdWithProducts(opportunityIds));		
 		
 		// Optionally apply discounts as part of invoice creation
 		if(discountPercentage!=null && discountPercentage>0)
