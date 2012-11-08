@@ -49,7 +49,6 @@
  *
  * TODO: Need to complete the 100% coverage by covering parameter exceptions in tests
  * TODO: Need to add some more test methods for more complex use cases and some unexpected (e.g. registerDirty and then registerDeleted)
- * TODO: CRUD restrictions
  *
  **/
 public class SObjectUnitOfWork
