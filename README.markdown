@@ -3,7 +3,7 @@ DF12 Session : Applying Enterprise Application Design Patterns on Force.com
 
 Design patterns are an invaluable tool for developers and architects looking to build enterprise solutions. In this session we will present some tried and tested enterprise application engineering patterns that have been used in other platforms and languages. We will discuss and illustrate how patterns such as Data Mapper, Service Layer, Unit of Work and of course Model View Controller can be applied to Force.com. Applying these patterns can help manage governed resources (such as DML) better, encourage better separation-of-concerns in your logic and enforce Force.com coding best practices.
 
-You can view the slides for this session [here](http://www.slideshare.net/afawcett/df12-applying-enterprise-application-design-patterns-on-forcecom?ref=http://andrewfawcett.wordpress.com/) and a re-recording of the session [here](http://www.screencast.com/users/AndrewFawcett/folders/Default/media/c30db07e-e899-4c42-875d-cad0be2bb4d7).
+You can view the slides for this session [here](http://www.slideshare.net/afawcett/df12-applying-enterprise-application-design-patterns-on-forcecom?ref=http://andrewfawcett.wordpress.com/) and a re-recording of the session [here](https://docs.google.com/file/d/0B6brfGow3cD8UHhzWDF1WENEaXc/edit?pli=1).
 
 Introduction and Acknowledgement
 --------------------------------
