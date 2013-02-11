@@ -5,6 +5,10 @@ Design patterns are an invaluable tool for developers and architects looking to 
 
 You can view the slides for this session [here](http://www.slideshare.net/afawcett/df12-applying-enterprise-application-design-patterns-on-forcecom?ref=http://andrewfawcett.wordpress.com/) and a re-recording of the session [here](https://docs.google.com/file/d/0B6brfGow3cD8UHhzWDF1WENEaXc/edit?pli=1). I have also since started a series of blog entires on this topic, [Apex Enterprise Patterns – Separation of Concerns](http://andrewfawcett.wordpress.com/2012/11/16/apex-enterprise-patterns-separation-of-concerns/).
 
+Latest articles on developer.force.com.
+- [Apex Enterprise Patterns - Separation of Concerns](http://wiki.developerforce.com/page/Apex_Enterprise_Patterns_-_Separation_of_Concerns)
+- [Apex Enterprise Patterns - Service Layer](http://wiki.developerforce.com/page/Apex_Enterprise_Patterns_-_Service_Layer)
+
 Introduction and Acknowledgement
 --------------------------------
 
