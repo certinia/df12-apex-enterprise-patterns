@@ -32,7 +32,9 @@ public with sharing class OpportunityApplyDiscountController
 {
 	public Decimal DiscountPercentage { get; set; } 
 	
-	private ApexPages.StandardController standardController = null; 
+	private ApexPages.StandardController standardController = null;
+	
+	private ApexPages.StandardSetController standardSetController = null; 
 	
 	public OpportunityApplyDiscountController(ApexPages.StandardController controller)
 	{
@@ -46,6 +48,22 @@ public with sharing class OpportunityApplyDiscountController
 			// Apply discount entered to the current Opportunity
 			OpportunitiesService.applyDiscounts(
 				new Set<ID> { standardController.getId() }, DiscountPercentage);
+		}
+		catch (Exception e)
+		{
+			ApexPages.addMessages(e);
+		}		
+		
+		return ApexPages.hasMessages() ? null : standardController.view();				
+	}
+
+	public PageReference applyDiscounts()
+	{
+		try
+		{
+			// Apply discount entered to the selected Opportunities
+			OpportunitiesService.applyDiscounts(
+				new Map<Id, SObject>(standardSetController.getSelected()).keySet(), DiscountPercentage);
 		}
 		catch (Exception e)
 		{
