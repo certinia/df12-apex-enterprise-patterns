@@ -53,7 +53,7 @@ public virtual with sharing class SObjectDomain
     public virtual void afterInsert()
     {
     	if(!SObjectDescribe.isCreateable())
-    	   throw new DomainException('Permission to create an ' + SObjectDescribe.getName() + ' dennied.');
+    	   throw new DomainException('Permission to create an ' + SObjectDescribe.getName() + ' denied.');
     	   
     	validate(); 
     }
@@ -61,7 +61,7 @@ public virtual with sharing class SObjectDomain
     public virtual void afterUpdate(Map<Id,SObject> oldSObjectMap) 
     {
     	if(!SObjectDescribe.isUpdateable())
-    	   throw new DomainException('Permission to udpate an ' + SObjectDescribe.getName() + ' dennied.');
+    	   throw new DomainException('Permission to udpate an ' + SObjectDescribe.getName() + ' denied.');
     	   
     	validate(); 
     }
@@ -69,7 +69,7 @@ public virtual with sharing class SObjectDomain
     public virtual void afterDelete() 
     {
     	if(!SObjectDescribe.isDeletable())
-    	   throw new DomainException('Permission to delete an ' + SObjectDescribe.getName() + ' dennied.');
+    	   throw new DomainException('Permission to delete an ' + SObjectDescribe.getName() + ' denied.');
     }	
 	
 	public interface IConstructable
