@@ -24,11 +24,22 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-public virtual with sharing class SObjectDomain 
+public virtual with sharing class SObjectDomain
 {
 	public List<SObject> Records { get; private set;}
 	
 	public Schema.DescribeSObjectResult SObjectDescribe {get; private set;}
+			
+	public static ErrorFactory Errors  {get; private set;}
+	
+	public static TestFactory Test  {get; private set;}
+	
+	static
+	{
+		Errors = new ErrorFactory();
+		
+		Test = new TestFactory();
+	}
 	
 	public SObjectDomain(List<SObject> sObjectList)
 	{
@@ -38,15 +49,20 @@ public virtual with sharing class SObjectDomain
 	}
 	
 	public virtual void applyDefaults() { }
-		
+	
 	public virtual void validate() { }
+	
+	public virtual void validate(Map<Id,SObject> existingRecords) 
+	{
+		validate();
+	}
 	
     public virtual void beforeInsert() 
     { 
     	applyDefaults(); 
     }
     
-    public virtual void beforeUpdate(Map<Id,SObject> oldSObjectMap) { }
+    public virtual void beforeUpdate(Map<Id,SObject> existingRecords) { }
     
     public virtual void beforeDelete() { }
     
@@ -58,12 +74,12 @@ public virtual with sharing class SObjectDomain
     	validate(); 
     }
     
-    public virtual void afterUpdate(Map<Id,SObject> oldSObjectMap) 
+    public virtual void afterUpdate(Map<Id,SObject> existingRecords) 
     {
     	if(!SObjectDescribe.isUpdateable())
     	   throw new DomainException('Permission to udpate an ' + SObjectDescribe.getName() + ' denied.');
     	   
-    	validate(); 
+    	validate(existingRecords); 
     }
     
     public virtual void afterDelete() 
@@ -86,21 +102,179 @@ public virtual with sharing class SObjectDomain
 		String domainClassName = domainClass.getName();
 		Type constructableClass = Type.forName(domainClassName+'.Constructor');
 		IConstructable constructor = (IConstructable) constructableClass.newInstance();
+		if(System.Test.isRunningTest() & Test.Database.hasRecords())
+			Test.Database.testTriggerHandler(constructor);
+		else
+			triggerHandler(constructor);
+	}
+	
+	/**
+	 * Calls the applicable override methods such as beforeInsert, beforeUpdate etc. based on Trigger context
+	 **/
+	private static void triggerHandler(IConstructable domainConstructor)
+	{	
 		if(Trigger.isBefore)
 	    {
-	        if(Trigger.isInsert) constructor.construct(Trigger.new).beforeInsert();
-	        else if(Trigger.isUpdate) constructor.construct(Trigger.new).beforeUpdate(Trigger.oldMap);
-	        else if(Trigger.isDelete) constructor.construct(Trigger.oldMap.values()).beforeDelete();
+	        if(Trigger.isInsert) domainConstructor.construct(Trigger.new).beforeInsert();
+	        else if(Trigger.isUpdate) domainConstructor.construct(Trigger.new).beforeUpdate(Trigger.oldMap);
+	        else if(Trigger.isDelete) domainConstructor.construct(Trigger.oldMap.values()).beforeDelete();
 	    }
 	    else
 	    {
-	        if(Trigger.isInsert) constructor.construct(Trigger.new).afterInsert();
-	        else if(Trigger.isUpdate) constructor.construct(Trigger.new).afterUpdate(Trigger.oldMap);
-	        else if(Trigger.isDelete) constructor.construct(Trigger.oldMap.values()).afterDelete();
-	    }		
+	        if(Trigger.isInsert) domainConstructor.construct(Trigger.new).afterInsert();
+	        else if(Trigger.isUpdate) domainConstructor.construct(Trigger.new).afterUpdate(Trigger.oldMap);
+	        else if(Trigger.isDelete) domainConstructor.construct(Trigger.oldMap.values()).afterDelete();
+	    }				
 	}
 	
 	public class DomainException extends Exception
 	{
+	}
+
+	public String error(String message, SObject record)
+	{
+		return Errors.error(this, message, record);	
+	}
+	
+	public String error(String message, SObject record, SObjectField field)
+	{
+		return Errors.error(this, message, record, field);	
+	}
+	
+	public class ErrorFactory
+	{
+		private List<Error> errorList = new List<Error>(); 
+		
+		private ErrorFactory()
+		{
+			
+		}
+		
+		public String error(String message, SObject record)
+		{
+			return error(null, message, record);	
+		}
+
+		private String error(SObjectDomain domain, String message, SObject record)
+		{
+			ObjectError objectError = new ObjectError();
+			objectError.domain = domain;
+			objectError.message = message;
+			objectError.record = record;
+			errorList.add(objectError);
+			return message;	
+		}
+		
+		public String error(String message, SObject record, SObjectField field)
+		{
+			return error(null, message, record, field);	
+		}
+
+		private String error(SObjectDomain domain, String message, SObject record, SObjectField field)
+		{
+			FieldError fieldError = new FieldError();
+			fieldError.domain = domain;
+			fieldError.message = message;
+			fieldError.record = record;
+			fieldError.field = field;
+			errorList.add(fieldError);
+			return message;	
+		}	
+			
+		public List<Error> getAll()
+		{ 
+			return errorList.clone();
+		}
+		
+		public void clearAll()
+		{
+			errorList.clear();
+		}					
+	}
+	
+	public class FieldError extends ObjectError
+	{
+		public SObjectField field;
+		
+		private FieldError()
+		{		
+			
+		}
+	}
+	
+	public virtual class ObjectError extends Error
+	{
+		public SObject record;
+		
+		private ObjectError()
+		{
+		
+		}
+	}
+	
+	public abstract class Error
+	{
+		public String message;
+		public SObjectDomain domain;
+	}
+	
+	public class TestFactory
+	{
+		public MockDatabase Database = new MockDatabase();
+		 
+		private TestFactory()
+		{		
+			
+		}
+	}
+	
+	public class MockDatabase
+	{
+		private Boolean isInsert = false;
+		private Boolean isUpdate = false;
+		private Boolean isDelete = false;
+		private List<SObject> records = null;
+		private Map<Id, SObject> oldRecords = null;
+		
+		private MockDatabase()
+		{
+			
+		}
+			
+		private void testTriggerHandler(IConstructable domainConstructor)
+		{
+			// Before
+	        if(isInsert) domainConstructor.construct(records).beforeInsert();
+	        else if(isUpdate) domainConstructor.construct(records).beforeUpdate(oldRecords);
+	        else if(isDelete) domainConstructor.construct(oldRecords.values()).beforeDelete();
+			// After	        
+	        if(isInsert) domainConstructor.construct(records).afterInsert();
+	        else if(isUpdate) domainConstructor.construct(records).afterUpdate(oldRecords);
+	        else if(isDelete) domainConstructor.construct(oldRecords.values()).afterDelete();
+		}
+		
+		public void onInsert(List<SObject> records)
+		{
+			this.isInsert = true;
+			this.records = records;
+		}
+		
+		public void onUpdate(List<SObject> records, Map<Id, SObject> oldRecords)
+		{
+			this.isUpdate = true;
+			this.records = records;
+			this.oldRecords = oldRecords;
+		}
+		
+		public void onDelete(Map<Id, SObject> records)
+		{
+			this.isDelete = true;
+			this.oldRecords = records;
+		}
+		
+		public Boolean hasRecords()
+		{
+			return records!=null;
+		}
 	}
 }

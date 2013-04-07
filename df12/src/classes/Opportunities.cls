@@ -25,11 +25,22 @@
 **/
 
 public with sharing class Opportunities extends SObjectDomain
+	implements InvoicingService.ISupportInvoicing
 {
 	public Opportunities(List<Opportunity> sObjectList)
 	{
 		// Domain classes are initialised with lists to enforce bulkification throughout
 		super(sObjectList);
+	}
+	
+	public void generate(InvoicingService.InvoiceFactory invoiceFactory)
+	{
+		// Process Opportunities
+		for(Opportunity opportunity : (List<Opportunity>) Records)
+		{
+			// Utilise InvoiceFactory to create invoices
+			invoiceFactory.createInvoice(opportunity.AccountId, opportunity.Description, System.today().addDays(14));
+		}		
 	}
 	
 	public override void applyDefaults()
@@ -39,6 +50,50 @@ public with sharing class Opportunities extends SObjectDomain
 		{
 			opportunity.DiscountType__c = OpportunitySettings__c.getInstance().DiscountType__c;						
 		}
+	}
+
+	public override void validate()	
+	{
+		// Validate Opportunities
+		for(Opportunity opp : (List<Opportunity>) Records)
+		{
+			if(opp.Type!=null && opp.Type.startsWith('Existing') && opp.AccountId == null)
+			{
+				opp.AccountId.addError( error('You must provide an Account for Opportunities for existing Customers.', opp, Opportunity.AccountId) );					
+			}			
+		}		
+	}
+	
+	public override void validate(Map<Id,SObject> existingRecords)
+	{
+		super.validate(existingRecords);
+		
+		// Validate changes to Opportunities
+		for(Opportunity opp : (List<Opportunity>) Records)
+		{
+			Opportunity existingOpp = (Opportunity) existingRecords.get(opp.Id);
+			if(opp.Type != existingOpp.Type)
+			{
+				opp.Type.addError( error('You cannot change the Opportunity type once it has been created.', opp, Opportunity.Type) );
+			}
+		}
+	}
+	
+	public override void afterInsert()
+	{
+		super.afterInsert();
+		
+		// Related Accounts
+		List<Id> accountIds = new List<Id>();
+		for(Opportunity opp : (List<Opportunity>) Records)
+			if(opp.AccountId!=null)
+				accountIds.add(opp.AccountId);
+				
+		// Update last Opportunity activity on the related Accounts (via the Accounts domain class)
+		SObjectUnitOfWork uow = new SObjectUnitOfWork(new Schema.SObjectType[] { Account.SObjectType }); 
+		Accounts accounts = new Accounts([select Id, Name from Account where id in :accountIds]);
+		accounts.updateOpportunityActivity(uow);
+		uow.commitWork();				
 	}
 	
 	public void applyDiscount(Decimal discountPercentage, SObjectUnitOfWork uow)
