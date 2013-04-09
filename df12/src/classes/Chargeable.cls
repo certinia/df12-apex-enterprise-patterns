@@ -35,17 +35,13 @@ public with sharing abstract class Chargeable extends SObjectDomain
 	 
 	public abstract List<Integer> calculateHoursWorked();
 	
-	public override void beforeInsert()
+	public override void onBeforeInsert()
 	{
-		super.beforeInsert();
-		
 		updateCostOfHoursWorked();		
 	}
 	
-	public override void beforeUpdate(Map<Id,SObject> existingRecords)
+	public override void onBeforeUpdate(Map<Id,SObject> existingRecords)
 	{
-		super.beforeUpdate(existingRecords);
-		
 		updateCostOfHoursWorked();
 	}			
 	

@@ -43,7 +43,7 @@ public with sharing class Opportunities extends SObjectDomain
 		}		
 	}
 	
-	public override void applyDefaults()
+	public override void onApplyDefaults()
 	{
 		// Apply defaults to Opportunities
 		for(Opportunity opportunity : (List<Opportunity>) Records)
@@ -52,7 +52,7 @@ public with sharing class Opportunities extends SObjectDomain
 		}
 	}
 
-	public override void validate()	
+	public override void onValidate()	
 	{
 		// Validate Opportunities
 		for(Opportunity opp : (List<Opportunity>) Records)
@@ -64,10 +64,8 @@ public with sharing class Opportunities extends SObjectDomain
 		}		
 	}
 	
-	public override void validate(Map<Id,SObject> existingRecords)
+	public override void onValidate(Map<Id,SObject> existingRecords)
 	{
-		super.validate(existingRecords);
-		
 		// Validate changes to Opportunities
 		for(Opportunity opp : (List<Opportunity>) Records)
 		{
@@ -79,10 +77,8 @@ public with sharing class Opportunities extends SObjectDomain
 		}
 	}
 	
-	public override void afterInsert()
+	public override void onAfterInsert()
 	{
-		super.afterInsert();
-		
 		// Related Accounts
 		List<Id> accountIds = new List<Id>();
 		for(Opportunity opp : (List<Opportunity>) Records)

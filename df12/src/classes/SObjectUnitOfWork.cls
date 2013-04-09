@@ -270,7 +270,7 @@ public class SObjectUnitOfWork
 		
 		// Assert Results 
 		assertResults('UoW');
-		System.assertEquals(5 /* Oddly a setSavePoint consumes a DML */, Limits.getDmlStatements());				
+		System.assertEquals(6 /* Oddly a setSavePoint consumes a DML */, Limits.getDmlStatements());				
 
 		// Records to update
 		List<Opportunity> opps = [select Id, Name, (Select Id from OpportunityLineItems) from Opportunity where Name like 'UoW Test Name %' order by Name];
@@ -302,7 +302,7 @@ public class SObjectUnitOfWork
 		}
 		
 		// Assert Results
-		System.assertEquals(11, Limits.getDmlStatements());				
+		System.assertEquals(12, Limits.getDmlStatements());				
 		opps = [select Id, Name, (Select Id, PricebookEntry.Product2.Name, Quantity from OpportunityLineItems Order By PricebookEntry.Product2.Name) from Opportunity where Name like 'UoW Test Name %' order by Name];
 		System.assertEquals(10, opps.size());
 		System.assertEquals('UoW Test Name 0 Changed', opps[0].Name);
@@ -320,7 +320,7 @@ public class SObjectUnitOfWork
 		}		
 		
 		// Assert Results
-		System.assertEquals(15, Limits.getDmlStatements());		
+		System.assertEquals(16, Limits.getDmlStatements());		
 		opps = [select Id, Name, (Select Id, PricebookEntry.Product2.Name, Quantity from OpportunityLineItems Order By PricebookEntry.Product2.Name) from Opportunity where Name like 'UoW Test Name %' order by Name];
 		List<Product2> prods = [Select Id from Product2 where Name = 'UoW Test Name 0 Changed : New Product'];
 		System.assertEquals(10, opps.size());
@@ -368,7 +368,7 @@ public class SObjectUnitOfWork
 		
 		// Assert Results from using UnitOfWork
 		Integer costToCommitUoW = Limits.getScriptStatements();
-		System.assertEquals(5, Limits.getDmlStatements());		
+		System.assertEquals(6, Limits.getDmlStatements());		
 		assertResults('UoW');
 				
 		// Insert Opportunities "without" UnitOfWork

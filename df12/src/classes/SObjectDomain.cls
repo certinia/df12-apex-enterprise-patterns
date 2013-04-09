@@ -24,6 +24,20 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
+/**
+ * Base class aiding in the implemetnation of a Domain Model around SObject collections
+ * 
+ * Domain (software engineering). “a set of common requirements, terminology, and functionality 
+ * for any software program constructed to solve a problem in that field”,
+ * http://en.wikipedia.org/wiki/Domain_(software_engineering)
+ *
+ * Domain Model, “An object model of the domain that incorporates both behavior and data.”, 
+ * “At its worst business logic can be very complex. Rules and logic describe many different "
+ * "cases and slants of behavior, and it's this complexity that objects were designed to work with...” 
+ * Martin Fowler, EAA Patterns
+ * http://martinfowler.com/eaaCatalog/domainModel.html
+ *
+ **/
 public virtual with sharing class SObjectDomain
 {
 	public List<SObject> Records { get; private set;}
@@ -48,44 +62,116 @@ public virtual with sharing class SObjectDomain
 		SObjectDescribe = Records.getSObjectType().getDescribe();
 	}
 	
-	public virtual void applyDefaults() { }
+	/**
+	 * Override this to apply defaults to the records, this is called by the handleBeforeInsert method
+	 **/
+	public virtual void onApplyDefaults() { }
 	
-	public virtual void validate() { }
+	/**
+	 * Override this to apply general validation to be performed during insert or update, called by the handleAfterInsert and handleAfterUpdate methods
+	 **/
+	public virtual void onValidate() {	}
 	
-	public virtual void validate(Map<Id,SObject> existingRecords) 
-	{
-		validate();
-	}
+	/**
+	 * Override this to apply validation to be performed during insert, called by the handleAfterUpdate method
+	 **/
+	public virtual void onValidate(Map<Id,SObject> existingRecords)	{ }
+
+	/**
+	 * Override this to perform processing during the before insert phase, this is called by the handleBeforeInsert method
+	 **/
+    public virtual void onBeforeInsert() { }
+    
+	/**
+	 * Override this to perform processing during the before update phase, this is called by the handleBeforeUpdate method
+	 **/
+    public virtual void onBeforeUpdate(Map<Id,SObject> existingRecords) { }
+    
+	/**
+	 * Override this to perform processing during the before delete phase, this is called by the handleBeforeDelete method
+	 **/
+    public virtual void onBeforeDelete() { }
+    
+	/**
+	 * Override this to perform processing during the after insert phase, this is called by the handleAfterInsert method
+	 **/
+    public virtual void onAfterInsert() { }
+    
+	/**
+	 * Override this to perform processing during the after update phase, this is called by the handleAfterUpdate method
+	 **/    
+    public virtual void onAfterUpdate(Map<Id,SObject> existingRecords) { }
+    
+	/**
+	 * Override this to perform processing during the after delete phase, this is called by the handleAfterDelete method
+	 **/    
+    public virtual void onAfterDelete() { }	
 	
-    public virtual void beforeInsert() 
+	/**
+	 * Base handler for the Apex Trigger event Before Insert, calls the onApplyDefaults method, followed by onBeforeInsert
+	 **/
+    public virtual void handleBeforeInsert() 
     { 
-    	applyDefaults(); 
+    	onApplyDefaults(); 
+    	onBeforeInsert();
     }
     
-    public virtual void beforeUpdate(Map<Id,SObject> existingRecords) { }
+    /**
+     * Base handler for the Apex Trigger event Before Update, calls the onBeforeUpdate method
+     **/
+    public void handleBeforeUpdate(Map<Id,SObject> existingRecords) 
+    {
+    	onBeforeUpdate(existingRecords);
+    }
     
-    public virtual void beforeDelete() { }
+    /**
+     * Base handler for the Apex Trigger event Before Delete, calls the onBeforeDelete method
+     **/
+    public void handleBeforeDelete() 
+    {
+    	onBeforeDelete();
+    }
     
-    public virtual void afterInsert()
+    /**
+     * Base handler for the Apex Trigger event After Insert, checks object security and calls the onValidate and onAfterInsert methods
+     *
+     * @throws DomainException if the current user context is not able to create records
+     **/
+    public void handleAfterInsert()
     {
     	if(!SObjectDescribe.isCreateable())
     	   throw new DomainException('Permission to create an ' + SObjectDescribe.getName() + ' denied.');
     	   
-    	validate(); 
+    	onValidate();
+    	onAfterInsert(); 
     }
     
-    public virtual void afterUpdate(Map<Id,SObject> existingRecords) 
+    /**
+     * Base handler for the Apex Trigger event After Update, checks object security and calls the onValidate, onValidate(Map<Id,SObject>) and onAfterUpdate methods
+     *
+     * @throws DomainException if the current user context is not able to update records
+     **/
+    public void handleAfterUpdate(Map<Id,SObject> existingRecords) 
     {
     	if(!SObjectDescribe.isUpdateable())
     	   throw new DomainException('Permission to udpate an ' + SObjectDescribe.getName() + ' denied.');
     	   
-    	validate(existingRecords); 
+    	onValidate();
+    	onValidate(existingRecords);
+    	onAfterUpdate(existingRecords); 
     }
     
-    public virtual void afterDelete() 
+    /**
+     * Base handler for the Apex Trigger event After Delete, checks object security and calls the onAfterDelete method
+     *
+     * @throws DomainException if the current user context is not able to delete records
+     **/
+    public void handleAfterDelete() 
     {
     	if(!SObjectDescribe.isDeletable())
     	   throw new DomainException('Permission to delete an ' + SObjectDescribe.getName() + ' denied.');
+    	   
+    	onAfterDelete();
     }	
 	
 	public interface IConstructable
@@ -99,31 +185,47 @@ public virtual with sharing class SObjectDomain
 	 **/
 	public static void triggerHandler(Type domainClass)
 	{
+		// Construct the domain class constructor class
 		String domainClassName = domainClass.getName();
 		Type constructableClass = Type.forName(domainClassName+'.Constructor');
 		IConstructable constructor = (IConstructable) constructableClass.newInstance();
+		
+		// Process the trigger context
 		if(System.Test.isRunningTest() & Test.Database.hasRecords())
+		{
+			// If in test context and records in the mock database delegate initially to the mock database trigger handler
 			Test.Database.testTriggerHandler(constructor);
+		}
 		else
-			triggerHandler(constructor);
+		{
+			// Process the runtime Apex Trigger context 
+			triggerHandler(constructor, 
+				Trigger.isBefore, 
+				Trigger.isAfter, 
+				Trigger.isInsert, 
+				Trigger.isUpdate, 
+				Trigger.isDelete, 
+				Trigger.new, 
+				Trigger.oldMap);
+		}
 	}
 	
 	/**
-	 * Calls the applicable override methods such as beforeInsert, beforeUpdate etc. based on Trigger context
+	 * Calls the applicable override methods such as beforeInsert, beforeUpdate etc. based on a Trigger context
 	 **/
-	private static void triggerHandler(IConstructable domainConstructor)
+	private static void triggerHandler(IConstructable domainConstructor, Boolean isBefore, Boolean isAfter, Boolean isInsert, Boolean isUpdate, Boolean isDelete, List<SObject> newRecords, Map<Id, SObject> oldRecordsMap)
 	{	
-		if(Trigger.isBefore)
+		if(isBefore)
 	    {
-	        if(Trigger.isInsert) domainConstructor.construct(Trigger.new).beforeInsert();
-	        else if(Trigger.isUpdate) domainConstructor.construct(Trigger.new).beforeUpdate(Trigger.oldMap);
-	        else if(Trigger.isDelete) domainConstructor.construct(Trigger.oldMap.values()).beforeDelete();
+	        if(isInsert) domainConstructor.construct(newRecords).handleBeforeInsert();
+	        else if(isUpdate) domainConstructor.construct(newRecords).handleBeforeUpdate(oldRecordsMap);
+	        else if(isDelete) domainConstructor.construct(oldRecordsMap.values()).handleBeforeDelete();
 	    }
 	    else
 	    {
-	        if(Trigger.isInsert) domainConstructor.construct(Trigger.new).afterInsert();
-	        else if(Trigger.isUpdate) domainConstructor.construct(Trigger.new).afterUpdate(Trigger.oldMap);
-	        else if(Trigger.isDelete) domainConstructor.construct(Trigger.oldMap.values()).afterDelete();
+	        if(isInsert) domainConstructor.construct(newRecords).handleAfterInsert();
+	        else if(isUpdate) domainConstructor.construct(newRecords).handleAfterUpdate(oldRecordsMap);
+	        else if(isDelete) domainConstructor.construct(oldRecordsMap.values()).handleAfterDelete();
 	    }				
 	}
 	
@@ -243,14 +345,11 @@ public virtual with sharing class SObjectDomain
 			
 		private void testTriggerHandler(IConstructable domainConstructor)
 		{
-			// Before
-	        if(isInsert) domainConstructor.construct(records).beforeInsert();
-	        else if(isUpdate) domainConstructor.construct(records).beforeUpdate(oldRecords);
-	        else if(isDelete) domainConstructor.construct(oldRecords.values()).beforeDelete();
-			// After	        
-	        if(isInsert) domainConstructor.construct(records).afterInsert();
-	        else if(isUpdate) domainConstructor.construct(records).afterUpdate(oldRecords);
-	        else if(isDelete) domainConstructor.construct(oldRecords.values()).afterDelete();
+			// Mock Before
+			triggerHandler(domainConstructor, true, false, isInsert, isUpdate, isDelete, records, oldRecords);
+			
+			// Mock After
+			triggerHandler(domainConstructor, false, true, isInsert, isUpdate, isDelete, records, oldRecords);
 		}
 		
 		public void onInsert(List<SObject> records)

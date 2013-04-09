@@ -33,7 +33,7 @@ public with sharing class OpportunitiesTest
 	private static void testValidationWithoutDML()
 	{
 		Opportunities opps = new Opportunities(new Opportunity[] { new Opportunity ( Name = 'Test', Type = 'Existing Account' ) } );
-		opps.validate();
+		opps.onValidate();
 		System.assertEquals(1, SObjectDomain.Errors.getAll().size());		
 		System.assertEquals('You must provide an Account for Opportunities for existing Customers.', SObjectDomain.Errors.getAll()[0].message);
 		System.assertEquals(Opportunity.AccountId, ((SObjectDomain.FieldError)SObjectDomain.Errors.getAll()[0]).field); 		
