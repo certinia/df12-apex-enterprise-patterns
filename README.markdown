@@ -13,7 +13,7 @@ Latest articles on developer.force.com.
 IMPORTANT NOTE: As at 9th April 2013
 ------------------------------------
 
-The sample code in this repo was updated to reflect latest thinkings and designs, mainly around the SObjectDomain base class methods (e.g. beforeUpdate has become onBeforeUpdate). These new methods will be show cased in an upcoming article on developer.force.com (which will be linked above). The principles and general design shown below and corresponding slides are still as valid however.
+The sample code in this repo was updated to reflect some new ideas and designs, mainly around the SObjectDomain base class methods (e.g. beforeUpdate has become onBeforeUpdate). These new methods will be show cased in an upcoming article on developer.force.com (which will be linked above). The principles and general design shown below and corresponding slides are still as valid however.
 
 
 Introduction and Acknowledgement
