@@ -17,6 +17,8 @@ Thanks to [Martin Fowler](http://martinfowler.com/) for his clear and well defin
 Sample Code Class Diagram
 -------------------------
 
+**IMPORTANT NOTE: As at 9th April 2013:** The code was updated to reflect latest thinkings and designs, mainly around the SObjectDomain base class methods. These will be show cased in an upcoming article on developer.force.com (which will be linked above). The principles and general design shown below and corresponding slides are still as valid however.
+
 This class diagram gives an approximate view of the classes used in this sample. Colour coding helps illustrate how separation of concerns has been implemented.
 
 ![Class Diagram](http://yuml.me/572cfb8c)
