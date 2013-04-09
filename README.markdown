@@ -9,6 +9,13 @@ Latest articles on developer.force.com.
 - [Apex Enterprise Patterns - Separation of Concerns](http://wiki.developerforce.com/page/Apex_Enterprise_Patterns_-_Separation_of_Concerns)
 - [Apex Enterprise Patterns - Service Layer](http://wiki.developerforce.com/page/Apex_Enterprise_Patterns_-_Service_Layer)
 
+
+IMPORTANT NOTE: As at 9th April 2013
+------------------------------------
+
+The sample code in this repo was updated to reflect latest thinkings and designs, mainly around the SObjectDomain base class methods (e.g. beforeUpdate has become onBeforeUpdate). These new methods will be show cased in an upcoming article on developer.force.com (which will be linked above). The principles and general design shown below and corresponding slides are still as valid however.
+
+
 Introduction and Acknowledgement
 --------------------------------
 
@@ -16,8 +23,6 @@ Thanks to [Martin Fowler](http://martinfowler.com/) for his clear and well defin
 
 Sample Code Class Diagram
 -------------------------
-
-**IMPORTANT NOTE: As at 9th April 2013:** The code was updated to reflect latest thinkings and designs, mainly around the SObjectDomain base class methods. These will be show cased in an upcoming article on developer.force.com (which will be linked above). The principles and general design shown below and corresponding slides are still as valid however.
 
 This class diagram gives an approximate view of the classes used in this sample. Colour coding helps illustrate how separation of concerns has been implemented.
 
