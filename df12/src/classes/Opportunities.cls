@@ -84,7 +84,7 @@ public with sharing class Opportunities extends SObjectDomain
 		for(Opportunity opp : (List<Opportunity>) Records)
 			if(opp.AccountId!=null)
 				accountIds.add(opp.AccountId);
-				
+		
 		// Update last Opportunity activity on the related Accounts (via the Accounts domain class)
 		SObjectUnitOfWork uow = new SObjectUnitOfWork(new Schema.SObjectType[] { Account.SObjectType }); 
 		Accounts accounts = new Accounts([select Id, Name from Account where id in :accountIds]);

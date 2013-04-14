@@ -34,6 +34,7 @@ public abstract with sharing class SObjectSelector
 	}
 	
 	abstract List<Schema.SObjectField> getSObjectFieldList();
+	
 	abstract Schema.SObjectType getSObjectType();
 
 	public StringBuilder.FieldListBuilder getFieldListBuilder()
@@ -77,4 +78,91 @@ public abstract with sharing class SObjectSelector
     	if(!getSObjectType().getDescribe().isAccessible())
     	   throw new SObjectDomain.DomainException('Permission to access an ' + getSObjectType().getDescribe().getName() + ' dennied.');		
 	}
+	
+	static testMethod void testGetFieldListString()
+	{
+		TestSObjectSelector selector = new TestSObjectSelector();
+		if(UserInfo.isMultiCurrencyOrganization())
+			system.assertEquals('Name,Id,AccountNumber,AnnualRevenue,CurrencyIsoCode',selector.getFieldListString());
+		else
+			system.assertEquals('Name,Id,AccountNumber,AnnualRevenue',selector.getFieldListString());
+	}
+	
+	static testMethod void testGetSObjectName()
+	{
+		TestSObjectSelector selector = new TestSObjectSelector();
+		system.assertEquals('Account',selector.getSObjectName());
+	}
+	
+	static testMethod void testSelectSObjectsById()
+	{
+		// Inserting in reverse order so that we can test the order by of select 
+		List<Account> accountList = new List<Account> {
+			new Account(Name='TestAccount2',AccountNumber='A2',AnnualRevenue=12345.67),
+			new Account(Name='TestAccount1',AccountNumber='A1',AnnualRevenue=76543.21) };		
+		insert accountList;		
+		Set<Id> idSet = new Set<Id>();
+		for(Account item : accountList)
+			idSet.add(item.Id);
+			
+		Test.startTest();		
+		TestSObjectSelector selector = new TestSObjectSelector();
+		List<Account> result = (List<Account>) selector.selectSObjectsById(idSet);		
+		Test.stopTest();
+		
+		system.assertEquals(2,result.size());
+		system.assertEquals('TestAccount1',result[0].Name);
+		system.assertEquals('A1',result[0].AccountNumber);
+		system.assertEquals(76543.21,result[0].AnnualRevenue);
+		system.assertEquals('TestAccount2',result[1].Name);
+		system.assertEquals('A2',result[1].AccountNumber);
+		system.assertEquals(12345.67,result[1].AnnualRevenue);
+	}
+	
+	static testMethod void testAssertIsAccessible()
+	{
+		List<Account> accountList = new List<Account> {
+			new Account(Name='TestAccount2',AccountNumber='A2',AnnualRevenue=12345.67),
+			new Account(Name='TestAccount1',AccountNumber='A1',AnnualRevenue=76543.21) };		
+		insert accountList;		
+		Set<Id> idSet = new Set<Id>();
+		for(Account item : accountList)
+			idSet.add(item.Id);
+		
+		// Create a user which will not have access to the test object type
+		User testUser = SObjectDomain.createChatterExternalUser();
+		if(testUser==null)
+			return; // Abort the test if unable to create a user with low enough acess
+		System.runAs(testUser)
+		{					
+			TestSObjectSelector selector = new TestSObjectSelector();
+			try
+			{
+				List<Account> result = (List<Account>) selector.selectSObjectsById(idSet);
+				System.assert(false,'Expected exception was not thrown');
+			}
+			catch(SObjectDomain.DomainException e)
+			{
+				System.assertEquals('Permission to access an Account dennied.',e.getMessage());
+			}
+		}
+	}
+	
+	class TestSObjectSelector extends SObjectSelector
+	{
+		override List<Schema.SObjectField> getSObjectFieldList()
+		{
+			return new List<Schema.SObjectField> {
+				Account.Name,
+				Account.Id,
+				Account.AccountNumber,
+				Account.AnnualRevenue
+			};
+		}
+		
+		override Schema.SObjectType getSObjectType()
+		{
+			return Account.sObjectType;
+		}
+	}	
 }
