@@ -8,6 +8,8 @@ You can view the slides for this session [here](http://www.slideshare.net/afawce
 Latest articles on developer.force.com.
 - [Apex Enterprise Patterns - Separation of Concerns](http://wiki.developerforce.com/page/Apex_Enterprise_Patterns_-_Separation_of_Concerns)
 - [Apex Enterprise Patterns - Service Layer](http://wiki.developerforce.com/page/Apex_Enterprise_Patterns_-_Service_Layer)
+- [Apex Enterprise Patterns - Domain Layer](http://wiki.developerforce.com/page/Apex_Enterprise_Patterns_-_Domain_Layer)
+- [Apex Enterprise Patterns - Selector Layer
 
 
 IMPORTANT NOTE: Updates 9th April 2013
