@@ -3,7 +3,7 @@ Application Enterprise Patterns on Force.com
 
 Design patterns are an invaluable tool for developers and architects looking to build enterprise solutions. Here are presented some tried and tested enterprise application engineering patterns that have been used in other platforms and languages. We will discuss and illustrate how patterns such as Data Mapper, Service Layer, Unit of Work and of course Model View Controller can be applied to Force.com. Applying these patterns can help manage governed resources (such as DML) better, encourage better separation-of-concerns in your logic and enforce Force.com coding best practices.
 
-You can view the slides for my Dreamforce 2012 session [here](http://www.slideshare.net/afawcett/df12-applying-enterprise-application-design-patterns-on-forcecom?ref=http://andrewfawcett.wordpress.com/) and a re-recording of the session [here](https://docs.google.com/a/financialforce.com/file/d/0B6brfGow3cD8UHhzWDF1WENEaXc/preview?pli=1). I have also since started a series of blog entires on this topic, [Apex Enterprise Patterns – Separation of Concerns](http://andrewfawcett.wordpress.com/2012/11/16/apex-enterprise-patterns-separation-of-concerns/).
+You can view the slides for my Dreamforce 2012 session [here](http://www.slideshare.net/afawcett/df12-applying-enterprise-application-design-patterns-on-forcecom?ref=http://andrewfawcett.wordpress.com/) and a re-recording of the session [here](https://docs.google.com/a/financialforce.com/file/d/0B6brfGow3cD8UHhzWDF1WENEaXc/preview?pli=1).
 
 Latest Article Series on Developer Force.com
 --------------------------------------------
