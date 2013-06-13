@@ -328,7 +328,112 @@ public class SObjectUnitOfWork
 		System.assertEquals(1, opps[0].OpportunityLineItems.size()); // Should have deleted OpportunityLineItem added above
 		System.assertEquals(0, prods.size()); // Should have deleted Product added above				
 	}
-	
+		
+	@IsTest(seeAllData=true)
+	public static void testUnitOfWorkUseCae1()
+	{
+		// Grab the Standard Pricebook (cannot create these via Apex!?!)
+		Pricebook2 standardPricebook = [select Id from Pricebook2 where IsStandard = true];		
+		
+		// Insert Opporunities with UnitOfWork
+		{
+			SObjectUnitOfWork uow = new SObjectUnitOfWork(MY_SOBJECTS);				
+			for(Integer o=0; o<10; o++)
+			{
+				Opportunity opp = new Opportunity();
+				opp.Name = 'UoW Test Name ' + o;
+				opp.StageName = 'Open';
+				opp.CloseDate = System.today();
+				uow.registerNew(opp);		
+				Product2 product = new Product2();
+				product.Name = opp.Name + ' : Product : ' + o;
+				uow.registerNew(product);		
+				PricebookEntry pbe = new PricebookEntry();
+				pbe.UnitPrice = 10;
+				pbe.IsActive = true;
+				pbe.UseStandardPrice = false;
+				pbe.Pricebook2Id = standardPricebook.Id;
+				uow.registerNew(pbe, PricebookEntry.Product2Id, product);		
+				for(Integer i=0; i<o+1; i++)
+				{						
+					OpportunityLineItem oppLineItem = new OpportunityLineItem();
+					oppLineItem.Quantity = 1;
+					oppLineItem.TotalPrice = 10;
+					uow.registerRelationship(oppLineItem, OpportunityLineItem.PricebookEntryId, pbe);
+					uow.registerNew(oppLineItem, OpportunityLineItem.OpportunityId, opp);
+				}
+			}		
+			uow.commitWork();
+		}
+
+		// Query Opportunity		
+		List<Opportunity> opportunities = 
+			[select Id, Name, Amount, 
+				(Select Id, PricebookEntry.Id, PricebookEntry.Product2.Id, PricebookEntry.Product2.Name, UnitPrice, Quantity from OpportunityLineItems order by PricebookEntry.Product2.Id) 
+			 from Opportunity 
+			 where Name 
+			 like 'UoW Test Name %' 
+			 order by Name];
+		System.assertEquals(10, opportunities.size());
+		System.assertEquals(100, opportunities[9].Amount);		
+		System.assertEquals(10, opportunities[9].OpportunityLineItems.size()); // Should have deleted OpportunityLineItem added above			 
+			 
+		{
+			// Consolidate Products on the Opportunities
+			SObjectUnitOfWork uow = new SObjectUnitOfWork(MY_SOBJECTS);
+			for(Opportunity opportunity : opportunities)
+			{			
+				// Group the lines by Product
+				Map<Id, List<OpportunityLineItem>> linesByGroup = new Map<Id, List<OpportunityLineItem>>();				
+				for(OpportunityLineItem opportunityLineItem : opportunity.OpportunityLineItems)
+				{
+					Id productId = opportunityLineItem.PricebookEntry.Product2.Id;
+					List<OpportunityLineItem> linesForThisProduct = linesByGroup.get(productId);
+					if(linesForThisProduct==null) 
+						linesByGroup.put(productId, (linesForThisProduct = new List<OpportunityLineItem>()));
+					linesForThisProduct.add(opportunityLineItem);
+				}
+				// For groups with more than one 1 line, delete those lines and create a new consolidated one
+				for(List<OpportunityLineItem> linesForGroup : linesByGroup.values() )
+				{
+					// More than one line with this product?
+					if(linesForGroup.size()>1)
+					{
+						// Delete the duplicate product lines and caculate new quantity total
+						Decimal consolidatedQuantity = 0;
+						for(OpportunityLineItem lineForProduct : linesForGroup)
+						{
+							consolidatedQuantity += lineForProduct.Quantity;
+							uow.registerDeleted(lineForProduct);
+						}
+						// Create new consolidated line
+						OpportunityLineItem consolidatedLine = new OpportunityLineItem();
+						consolidatedLine.Quantity = consolidatedQuantity;
+						consolidatedLine.UnitPrice = linesForGroup[0].UnitPrice;
+						consolidatedLine.PricebookEntryId = linesForGroup[0].PricebookEntry.Id;
+						uow.registerNew(consolidatedLine, OpportunityLineItem.OpportunityId, opportunity);						
+						// Note the last consolidation date
+						opportunity.Description = 'Consolidated on ' + System.today();
+						uow.registerDirty(opportunity);
+					}					
+				}				
+			}
+			uow.commitWork();
+		}
+		
+		// Query Opportunity		
+		opportunities = 
+			[select Id, Name, Amount,
+				(Select Id, PricebookEntry.Id, PricebookEntry.Product2.Id, PricebookEntry.Product2.Name, UnitPrice, Quantity from OpportunityLineItems order by PricebookEntry.Product2.Id) 
+			 from Opportunity 
+			 where Name 
+			 like 'UoW Test Name %' 
+			 order by Name];
+		System.assertEquals(10, opportunities.size());
+		System.assertEquals(100, opportunities[9].Amount);
+		System.assertEquals(1, opportunities[9].OpportunityLineItems.size()); // Should have deleted OpportunityLineItem added above			 		
+	}
+		
 	@IsTest(seeAllData=true)
 	public static void testUnitOfWorkOverhead()
 	{
