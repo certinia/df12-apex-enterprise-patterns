@@ -1,3 +1,8 @@
+**NOTE: [Apex Enterprise Patterns have moved!](https://github.com/financialforcedev/fflib-apex-common)**
+==================================================================================================================
+
+This repository will remain compatible with the implementation and presentations given at **Dreamforce 2012**. The above link takes you to a repository that will form a more formal place to share the classes supporting these patterns. Sharing the initial structure and features of the ones orignally presented, but adopting new features and evoluations from here onwards.
+
 Application Enterprise Patterns on Force.com
 ============================================
 
