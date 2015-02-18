@@ -72,8 +72,12 @@ public virtual with sharing class StringBuilder
         
         public virtual override void add(list<String> values)
         {
-            list<string> lvalues = new list<string>();
-            if(m_stringValue != null) 
+        	if(values == null || values.isempty()) 
+        	{
+        		return;
+        	}
+            list<string> lvalues = new list<string>();            
+            if(m_stringValue != null ) 
             {
                 lvalues .add(this.formatter);
             }
