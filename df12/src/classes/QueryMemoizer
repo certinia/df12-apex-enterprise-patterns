@@ -1,0 +1,14 @@
+public static class QueryMemoizer 
+{
+	private static map<string,list<sobject>> memoizeMap = new map<string,list<sobject>>();
+
+	public static list<sobject> getQueryResult(string query)
+	{
+		if(!QueryMemoizer.memoizeMap.containskey(query))
+		{
+			list<sobject> lSobject = Database.query(query);
+			QueryMemoizer.memoizeMap.put(query,lSobject);
+		}
+		return QueryMemoizer.memoizeMap.get(query);
+	}
+}
