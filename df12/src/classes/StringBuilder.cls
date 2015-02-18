@@ -26,29 +26,29 @@
 
 public virtual with sharing class StringBuilder
 {
-	protected String m_stringValue;
-	
-	public StringBuilder() {}
-	
+	protected list<String> m_stringValue;
+	public StringBuilder() 
+	{
+		m_stringValue = new list<string>();
+	}
 	public StringBuilder(List<String> values)
 	{
-		add(values);
+		m_stringValue = new list<string>(values);
 	}
 	
 	public virtual void add(List<String> values)
 	{
-		for(String value : values)
-			add(value);
+		m_stringValue.addall(values);
 	}
 
 	public virtual void add(String value)
 	{
-		m_stringValue = ( m_stringValue==null ? value : m_stringValue + value );
+		m_stringValue.add(value);
 	}
 
 	public virtual String getStringValue()
 	{
-		return m_stringValue;
+		return string.join(m_stringValue,'');
 	}
 
 
@@ -65,7 +65,13 @@ public virtual with sharing class StringBuilder
 		
 		public virtual override void add(String value)
 		{
-			m_stringValue = ( m_stringValue==null ? '{0}' + value : m_stringValue + ',{0}' + value );
+			list<string> val = new list<string>();
+			if(!m_stringValue.isempty()) {
+				val.add(',');	
+			}
+			val.add('{0}');
+			val.add(value);
+			this.add(val);
 		}
 		
 		public override String getStringValue()
@@ -75,7 +81,7 @@ public virtual with sharing class StringBuilder
 		
 		public String getStringValue(String itemPrefix)
 		{
-			return m_stringValue==null ? null : String.format(m_stringValue,new List<String>{itemPrefix});
+			return m_stringValue.isempty() ? null : String.format(super.getStringValue(),new List<String>{itemPrefix});
 		}
 	}
 
