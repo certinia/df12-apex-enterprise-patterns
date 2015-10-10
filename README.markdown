@@ -77,7 +77,7 @@ Data Mapper (Selector)
 
 _"Objects and relational databases have different mechanisms for structuring data. Many parts of an object, such as collections and inheritance, aren't present in relational databases. When you build an object model with a lot of business logic it's valuable to use these mechanisms to better organize the data and the behavior that goes with it. Doing so leads to variant schemas; that is, the object schema and the relational schema don't match up."_ <http://martinfowler.com/eaaCatalog/dataMapper.html>
 
-**Force.com Note:** This pattern is an ideal place to place CRUD security checks for permission to read. It also helps avoid runtime exceptions relating to fields referenced that have not been queried. Since it can help form and encapsulate a consistant place for placing code relating to querying data as apposed to spreading adhoc SOQL queries throughout your logic.
+**Force.com Note:** This pattern is an ideal place to place CRUD security checks for permission to read. It also helps avoid runtime exceptions relating to fields referenced that have not been queried. Since it can help form and encapsulate a consistent place for placing code relating to querying data as apposed to spreading adhoc SOQL queries throughout your logic.
 
 **See** [OpportunitiesSelector.cls](https://github.com/financialforcedev/df12-apex-enterprise-patterns/blob/master/df12/src/classes/OpportunitiesSelector.cls), [OpportunityLineItemsSelector.cls](https://github.com/financialforcedev/df12-apex-enterprise-patterns/blob/master/df12/src/classes/OpportunityLineItemsSelector.cls) and [SObjectSelector](https://github.com/financialforcedev/df12-apex-enterprise-patterns/blob/master/df12/src/classes/SObjectSelector.cls)
 
