@@ -26,76 +26,101 @@
 
 public virtual with sharing class StringBuilder
 {
-	protected String m_stringValue;
-	
-	public StringBuilder() {}
-	
-	public StringBuilder(List<String> values)
-	{
-		add(values);
-	}
-	
-	public virtual void add(List<String> values)
-	{
-		for(String value : values)
-			add(value);
-	}
+    protected list<String> m_stringValue;
+    public StringBuilder() 
+    {
+        m_stringValue = new list<string>();
+    }
+    public StringBuilder(List<String> values)
+    {
+        m_stringValue = new list<string>(values);
+    }
+    
+    public virtual void add(List<String> values)
+    {
+        m_stringValue.addall(values);
+    }
 
-	public virtual void add(String value)
-	{
-		m_stringValue = ( m_stringValue==null ? value : m_stringValue + value );
-	}
+    public virtual void add(String value)
+    {
+        m_stringValue.add(value);
+    }
 
-	public virtual String getStringValue()
-	{
-		return m_stringValue;
-	}
+    public virtual String getStringValue()
+    {
+        return string.join(m_stringValue,'');
+    }
 
 
-	/** Subclasses **/
+    /** Subclasses **/
 
-	public virtual with sharing class CSVBuilder extends StringBuilder
-	{
-		public CSVBuilder() {}
+    public virtual with sharing class CSVBuilder extends StringBuilder
+    {
+        private transient string formatter = '{0}';
+        public CSVBuilder() {}
 
-		public CSVBuilder(List<String> values)
-		{
-			super(values);
-		}
-		
-		public virtual override void add(String value)
-		{
-			m_stringValue = ( m_stringValue==null ? '{0}' + value : m_stringValue + ',{0}' + value );
-		}
-		
-		public override String getStringValue()
-		{
-			return getStringValue('');
-		}
-		
-		public String getStringValue(String itemPrefix)
-		{
-			return m_stringValue==null ? null : String.format(m_stringValue,new List<String>{itemPrefix});
-		}
-	}
+        public CSVBuilder(List<String> values)
+        {
+            this.add(values);
+        }
+        
+        public virtual override void add(String value)
+        {
+            list<string> values = new list<string>{value};             
+            this.add(values);
+        }
+        
+        public virtual override void add(list<String> values)
+        {
+        	if(values == null || values.isempty()) 
+        	{
+        		return;
+        	}
+            list<string> lvalues = new list<string>();            
+            if(m_stringValue != null ) 
+            {
+                lvalues .add(this.formatter);
+            }
+            for(string aValue : values) 
+            {
+                 lvalues .add(aValue);
+                 lvalues .add(this.formatter);
+            }
+            if(!lvalues.isempty()) 
+            {
+                lvalues.remove(lvalues.size()-1);
+            }
+            super.add(lvalues);
+        }
+        
+        public override String getStringValue()
+        {
+            return this.getStringValue(',');
+        }
+        
+        public String getStringValue(String itemPrefix)
+        {
+            return m_stringValue.isempty() ? null : String.format(super.getStringValue(),new List<String>{itemPrefix});
+        }
+    }
 
-	public virtual with sharing class FieldListBuilder extends CSVBuilder
-	{
-		public FieldListBuilder(List<Schema.SObjectField> values)
-		{
-			for(Schema.SObjectField value : values)
-				add(value.getDescribe().getName());
-		}
-	}
-	
-	public with sharing class MultiCurrencyFieldListBuilder extends FieldListBuilder
-	{
-		public MultiCurrencyFieldListBuilder(List<Schema.SObjectField> values)
-		{
-			super(values);
-			
-			if(Userinfo.isMultiCurrencyOrganization())
-				add('CurrencyIsoCode');
-		}
-	}
+    public virtual with sharing class FieldListBuilder extends CSVBuilder
+    {
+        public FieldListBuilder(List<Schema.SObjectField> values)
+        {
+            for(Schema.SObjectField value : values)
+                add(value.getDescribe().getName());
+        }
+    }
+    
+    public with sharing class MultiCurrencyFieldListBuilder extends FieldListBuilder
+    {
+        public MultiCurrencyFieldListBuilder(List<Schema.SObjectField> values)
+        {
+            super(values);
+            
+            if(Userinfo.isMultiCurrencyOrganization())
+                add('CurrencyIsoCode');
+        }
+    }
 }
