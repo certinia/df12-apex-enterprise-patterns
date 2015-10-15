@@ -70,7 +70,7 @@ public abstract with sharing class SObjectSelector
 	public List<SObject> selectSObjectsById(Set<Id> idSet)
 	{
 		assertIsAccessible();
-		return Database.query(String.format('SELECT {0} FROM {1} WHERE id in :idSet ORDER BY {2}', new List<String>{getFieldListString(),getSObjectName(),getOrderBy()}));
+		return QueryMemoizer.getQueryResult(String.format('SELECT {0} FROM {1} WHERE id in :idSet ORDER BY {2}', new List<String>{getFieldListString(),getSObjectName(),getOrderBy()}));
 	}
 
 	public void assertIsAccessible()
